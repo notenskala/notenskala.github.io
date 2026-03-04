@@ -104,29 +104,19 @@ downloadBtn.addEventListener('click', function() {
   const modus = getRundungsModus();
   const filename = `notentabelle_${maxPunkte}p_${modus}.png`;
 
-  const wrapper = document.querySelector('.table-wrapper');
-  const originalOverflow = wrapper.style.overflow;
-  const originalHeight = wrapper.style.height;
-
-  wrapper.style.overflow = 'visible';
-  wrapper.style.height = 'auto';
-
-  html2canvas(wrapper, {
+  const table = document.querySelector('table');
+  
+  html2canvas(table, {
     scale: 2,
     backgroundColor: '#ffffff'
   }).then(canvas => {
-    wrapper.style.overflow = originalOverflow;
-    wrapper.style.height = originalHeight;
-
     const link = document.createElement('a');
     link.download = filename;
     link.href = canvas.toDataURL('image/png');
     link.click();
   }).catch(error => {
     console.error('Fehler beim Erstellen des Bildes:', error);
-    alert('Fehler beim Erstellen des Bildes.');
-    wrapper.style.overflow = originalOverflow;
-    wrapper.style.height = originalHeight;
+    alert('Fehler beim Erstellen des Bildes. Bitte versuche es erneut.');
   });
 });
 
