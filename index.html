@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notenskala Berechnung - Gymnasiale Oberstufe</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -43,7 +44,11 @@
       <tbody id="tabellenKoerper"></tbody>
     </table>
   </div>
-  <div class="footer">proudly developed by Niklas</div>
+  
+  <div class="footer">
+    <button id="downloadBtn" class="download-btn">📸 als Bild herunterladen</button>
+    <span>proudly developed by Niklas</span>
+  </div>
 </div>
 <script src="script.js"></script>
 </body>
