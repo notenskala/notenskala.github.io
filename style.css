@@ -164,7 +164,6 @@ input:checked + .slider:before {
   transition: background-color 0.2s, transform 0.1s;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   white-space: nowrap;
-  margin-left: auto;  /* Button immer rechts */
 }
 
 .download-btn:hover {
@@ -232,7 +231,6 @@ td:last-child, th:last-child {
     justify-content: flex-start;
   }
   .download-btn {
-    margin-left: 0;  /* auf kleinen Bildschirmen linksbündig */
     align-self: flex-start;
   }
 }
