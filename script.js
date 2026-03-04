@@ -22,6 +22,7 @@ const tbody = document.getElementById('tabellenKoerper');
 const ungerundetCheckbox = document.getElementById('ungerundetCheckbox');
 const toggleRow = document.getElementById('toggleRow');
 const rundungToggle = document.getElementById('rundungToggle');
+const downloadBtn = document.getElementById('downloadBtn');
 
 ungerundetCheckbox.addEventListener('change', function() {
   if (this.checked) {
@@ -88,5 +89,45 @@ function tabelleAktualisieren() {
   
   tbody.innerHTML = htmlString;
 }
+
+function getRundungsModus() {
+  if (ungerundetCheckbox.checked) return 'ungerundet';
+  return rundungToggle.checked ? 'aufgerundet' : 'abgerundet';
+}
+
+downloadBtn.addEventListener('click', function() {
+  const maxPunkte = inputElement.value.trim();
+  if (maxPunkte === '' || isNaN(parseInt(maxPunkte, 10)) || parseInt(maxPunkte, 10) <= 0) {
+    alert('Bitte gültige Maximalpunktzahl eingeben.');
+    return;
+  }
+  const modus = getRundungsModus();
+  const filename = `notentabelle_${maxPunkte}p_${modus}.png`;
+
+  const wrapper = document.querySelector('.table-wrapper');
+  const originalOverflow = wrapper.style.overflow;
+  const originalHeight = wrapper.style.height;
+
+  wrapper.style.overflow = 'visible';
+  wrapper.style.height = 'auto';
+
+  html2canvas(wrapper, {
+    scale: 2,
+    backgroundColor: '#ffffff'
+  }).then(canvas => {
+    wrapper.style.overflow = originalOverflow;
+    wrapper.style.height = originalHeight;
+
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }).catch(error => {
+    console.error('Fehler beim Erstellen des Bildes:', error);
+    alert('Fehler beim Erstellen des Bildes.');
+    wrapper.style.overflow = originalOverflow;
+    wrapper.style.height = originalHeight;
+  });
+});
 
 tabelleAktualisieren();
