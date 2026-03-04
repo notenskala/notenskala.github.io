@@ -2,31 +2,49 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, inital-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notenskala Berechnung - Gymnasiale Oberstufe</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Notenskala Berechnung - Gymnasiale Oberstufe</h1>
-    <div class="input-area">
-      <label for="maxPunkte">Maximal erreichbare Punktzahl:</label>
-      <input type="number" id="maxPunkte" min="1" step="1" value="100" placeholder="punktzahl">
+<div class="container">
+  <h1>Notenskala Berechnung - Gymnasiale Oberstufe</h1>
+  <div class="input-area">
+    <label for="maxPunkte">Maximal erreichbare Punktzahl:</label>
+    <input type="number" id="maxPunkte" min="1" step="1" value="100" placeholder="z.B. 100">
+    
+    <div class="modi-container">
+      <div class="modi-row">
+        <label class="checkbox-label">
+          <input type="checkbox" id="ungerundetCheckbox" checked> ungerundet
+        </label>
+      </div>
+      
+      <div class="modi-row toggle-row" id="toggleRow" style="display: none;">
+        <span class="toggle-label">aufrunden</span>
+        <label class="switch">
+          <input type="checkbox" id="rundungToggle">
+          <span class="slider round"></span>
+        </label>
+        <span class="toggle-label">abrunden</span>
+      </div>
     </div>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Note</th>
-            <th>Punktzahl</th>
-            <th>Erreichte Punktzahl</th>
-          </tr>
-        </thead>
-        <tbody id="tabellenKoerper"></tbody>
-      </table>
-    </div>
-    <div class="footer">proudly developed by Niklas K.</div>
   </div>
-  <script src="script.js"></script>
+  
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Note</th>
+          <th>Punktzahl</th>
+          <th>Erreichte Punktzahl</th>
+        </tr>
+      </thead>
+      <tbody id="tabellenKoerper"></tbody>
+    </table>
+  </div>
+  <div class="footer">proudly developed by Niklas K.</div>
+</div>
+<script src="script.js"></script>
 </body>
 </html>
