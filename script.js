@@ -1,0 +1,36 @@
+const noten = [
+  {note: '1+', punkte: 15, minProz: 95, maxProz: 100},
+  {note: '1', punkte: 14, minProz: 90, maxProz: 94},
+  {note: '1-', punkte: 13, minProz: 85, maxProz: 89},
+  {note: '2+', punkte: 12, minProz: 80, maxProz: 84},
+  {note: '2', punkte: 11, minProz: 75, maxProz: 79},
+  {note: '2-', punkte: 10, minProz: 70, maxProz: 74},
+  {note: '3+', punkte: 9, minProz: 65, maxProz: 69},
+  {note: '3', punkte: 8, minProz: 60, maxProz: 64},
+  {note: '3-', punkte: 7, minProz: 55, maxProz: 59},
+  {note: '4+', punkte: 6, minProz: 50, maxProz: 54},
+  {note: '4', punkte: 5, minProz: 45, maxProz: 49},
+  {note: '4-', punkte: 4, minProz: 40, maxProz: 44},
+  {note: '5+', punkte: 3, minProz: 33, maxProz: 39},
+  {note: '5', punkte: 2, minProz: 27, maxProz: 32},
+  {note: '5-', punkte: 1, minProz: 20, maxProz: 26},
+  {note: '6', punkte: 0, minProz: 0, maxProz: 19}
+  ];
+
+const inputElement = document.getElementById('maxPunkte');
+const tbody = document.getElementById('tabellenKoerper');
+
+function tabelleAktualisieren() {
+  let maxPunkte = parseInt(inputElement.value, 10);
+  const gueltig = !isNaN(maxPunkte) && maxPunkte > 0;
+  let htmlString = '';
+  for (let n of noten) {
+    const note = n.note;
+    const punktzahl = n.punkte;
+    let bereichAnzeige = '-';
+    if (gueltig) {
+      const minPunkte = Math.ceil((n.minProz / 100) * maxPunkte);
+      const maxPunkteBerechnet = Math.floor((n.maxProz / 100) * maxPunkte);
+      if (minPunkte <= maxPunkteBerechnet) {
+        bereichAnzeige = `${minPunkte} - ${maxPunkteBerechnet}`
+      }
