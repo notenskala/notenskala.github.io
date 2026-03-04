@@ -60,8 +60,6 @@ input:focus {
 .modi-container {
   display: flex;
   flex-direction: column;
-  flex: 0 1 auto;
-  min-width: 0;
 }
 
 .modi-row {
@@ -85,17 +83,16 @@ input:focus {
 .toggle-row {
   gap: 10px;
   margin-top: 4px;
-  white-space: nowrap;
+  transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
   overflow: hidden;
-  width: 170px;
-  transition: width 0.3s ease, opacity 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+  max-height: 50px;
+  opacity: 1;
 }
 
 .toggle-row.hidden {
-  width: 0;
   opacity: 0;
+  max-height: 0;
   margin-top: 0;
-  padding: 0;
   pointer-events: none;
 }
 
@@ -103,7 +100,6 @@ input:focus {
   font-size: 0.9rem;
   font-weight: 500;
   color: #333;
-  display: inline-block;
 }
 
 .switch {
@@ -111,7 +107,6 @@ input:focus {
   display: inline-block;
   width: 56px;
   height: 28px;
-  vertical-align: middle;
 }
 
 .switch input {
@@ -169,7 +164,7 @@ input:checked + .slider:before {
   transition: background-color 0.2s, transform 0.1s;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   white-space: nowrap;
-  margin-left: auto;
+  margin-left: auto;  /* Button immer rechts */
 }
 
 .download-btn:hover {
@@ -211,6 +206,7 @@ th, td {
   border-bottom: 1px solid #ddd;
 }
 
+/* Zebrastreifen für bessere Lesbarkeit */
 tbody tr:nth-child(even) {
   background-color: #f5f5f5;
 }
@@ -236,7 +232,7 @@ td:last-child, th:last-child {
     justify-content: flex-start;
   }
   .download-btn {
-    margin-left: 0;
+    margin-left: 0;  /* auf kleinen Bildschirmen linksbündig */
     align-self: flex-start;
   }
 }
