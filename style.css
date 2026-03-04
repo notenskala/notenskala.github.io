@@ -60,7 +60,6 @@ input:focus {
 .modi-container {
   display: flex;
   flex-direction: column;
-  margin-left: auto;
 }
 
 .modi-row {
@@ -150,6 +149,31 @@ input:checked + .slider:before {
   transform: translateX(28px);
 }
 
+.download-btn {
+  background-color: #2b7a4b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  white-space: nowrap;
+}
+
+.download-btn:hover {
+  background-color: #1e5f3a;
+}
+
+.download-btn:active {
+  transform: scale(0.97);
+}
+
 .table-wrapper {
   flex: 1;
   overflow-y: auto;
@@ -196,11 +220,13 @@ td:last-child, th:last-child {
     gap: 0.5rem;
   }
   .modi-container {
-    margin-left: 0;
     width: 100%;
   }
   .modi-row {
     justify-content: flex-start;
+  }
+  .download-btn {
+    align-self: flex-start;
   }
 }
 
@@ -213,35 +239,9 @@ td:last-child, th:last-child {
 
 .footer {
   margin-top: 0.75rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  text-align: center;
   border-top: 1px dashed #ccc;
   padding-top: 0.5rem;
   font-size: 0.9rem;
   color: #666;
-}
-
-.download-btn {
-  background-color: #2b7a4b;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  transition: background-color 0.2s, transform 0.1s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.download-btn:hover {
-  background-color: #1e5f3a;
-}
-
-.download-btn:active {
-  transform: scale(0.97);
 }
