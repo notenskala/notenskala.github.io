@@ -32,7 +32,7 @@ h1 {
 .input-area {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 0.5rem;
 }
