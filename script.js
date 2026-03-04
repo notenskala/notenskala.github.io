@@ -24,7 +24,11 @@ const toggleRow = document.getElementById('toggleRow');
 const rundungToggle = document.getElementById('rundungToggle');
 
 ungerundetCheckbox.addEventListener('change', function() {
-  toggleRow.style.display = this.checked ? 'none' : 'flex';
+  if (this.checked) {
+    toggleRow.classList.add('hidden');
+  } else {
+    toggleRow.classList.remove('hidden');
+  }
   tabelleAktualisieren();
 });
 
@@ -45,30 +49,30 @@ function tabelleAktualisieren() {
     let bereichAnzeige = '—';
     
     if (gueltig) {
+      const minExakt = (n.minProz / 100) * maxPunkte;
+      const maxExakt = (n.maxProz / 100) * maxPunkte;
+      
       if (istUngerundet) {
-        const minPunkte = Math.ceil((n.minProz / 100) * maxPunkte);
-        const maxPunkteBerechnet = Math.floor((n.maxProz / 100) * maxPunkte);
-        if (minPunkte <= maxPunkteBerechnet) {
-          bereichAnzeige = `${minPunkte} – ${maxPunkteBerechnet}`;
+        const minAngezeigt = minExakt;
+        const maxAngezeigt = maxExakt;
+        if (minAngezeigt <= maxAngezeigt) {
+          bereichAnzeige = `${minAngezeigt.toFixed(2)} – ${maxAngezeigt.toFixed(2)}`;
+        } else {
+          bereichAnzeige = '—';
+        }
+      } else if (istAufrunden) {
+        const minAngezeigt = Math.ceil(minExakt);
+        const maxAngezeigt = Math.ceil(maxExakt);
+        if (minAngezeigt <= maxAngezeigt) {
+          bereichAnzeige = `${minAngezeigt} – ${maxAngezeigt}`;
         } else {
           bereichAnzeige = '—';
         }
       } else {
-        const minExakt = (n.minProz / 100) * maxPunkte;
-        const maxExakt = (n.maxProz / 100) * maxPunkte;
-        
-        let minAngezeigt, maxAngezeigt;
-        
-        if (istAufrunden) {
-          minAngezeigt = Math.ceil(minExakt * 100) / 100;
-          maxAngezeigt = Math.ceil(maxExakt * 100) / 100;
-        } else {
-          minAngezeigt = Math.floor(minExakt * 100) / 100;
-          maxAngezeigt = Math.floor(maxExakt * 100) / 100;
-        }
-        
+        const minAngezeigt = Math.floor(minExakt);
+        const maxAngezeigt = Math.floor(maxExakt);
         if (minAngezeigt <= maxAngezeigt) {
-          bereichAnzeige = `${minAngezeigt.toFixed(2)} – ${maxAngezeigt.toFixed(2)}`;
+          bereichAnzeige = `${minAngezeigt} – ${maxAngezeigt}`;
         } else {
           bereichAnzeige = '—';
         }
