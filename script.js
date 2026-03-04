@@ -19,32 +19,70 @@ const noten = [
 
 const inputElement = document.getElementById('maxPunkte');
 const tbody = document.getElementById('tabellenKoerper');
+const ungerundetCheckbox = document.getElementById('ungerundetCheckbox');
+const toggleRow = document.getElementById('toggleRow');
+const rundungToggle = document.getElementById('rundungToggle');
+
+ungerundetCheckbox.addEventListener('change', function() {
+  toggleRow.style.display = this.checked ? 'none' : 'flex';
+  tabelleAktualisieren();
+});
+
+rundungToggle.addEventListener('change', tabelleAktualisieren);
+inputElement.addEventListener('input', tabelleAktualisieren);
 
 function tabelleAktualisieren() {
   let maxPunkte = parseInt(inputElement.value, 10);
   const gueltig = !isNaN(maxPunkte) && maxPunkte > 0;
+  const istUngerundet = ungerundetCheckbox.checked;
+  const istAufrunden = !istUngerundet && rundungToggle.checked;
+  
   let htmlString = '';
+  
   for (let n of noten) {
     const note = n.note;
     const punktzahl = n.punkte;
     let bereichAnzeige = '—';
+    
     if (gueltig) {
-      const minPunkte = Math.ceil((n.minProz / 100) * maxPunkte);
-      const maxPunkteBerechnet = Math.floor((n.maxProz / 100) * maxPunkte);
-      if (minPunkte <= maxPunkteBerechnet) {
-        bereichAnzeige = `${minPunkte} – ${maxPunkteBerechnet}`;
+      if (istUngerundet) {
+        const minPunkte = Math.ceil((n.minProz / 100) * maxPunkte);
+        const maxPunkteBerechnet = Math.floor((n.maxProz / 100) * maxPunkte);
+        if (minPunkte <= maxPunkteBerechnet) {
+          bereichAnzeige = `${minPunkte} – ${maxPunkteBerechnet}`;
+        } else {
+          bereichAnzeige = '—';
+        }
       } else {
-        bereichAnzeige = '—';
+        const minExakt = (n.minProz / 100) * maxPunkte;
+        const maxExakt = (n.maxProz / 100) * maxPunkte;
+        
+        let minAngezeigt, maxAngezeigt;
+        
+        if (istAufrunden) {
+          minAngezeigt = Math.ceil(minExakt * 100) / 100;
+          maxAngezeigt = Math.ceil(maxExakt * 100) / 100;
+        } else {
+          minAngezeigt = Math.floor(minExakt * 100) / 100;
+          maxAngezeigt = Math.floor(maxExakt * 100) / 100;
+        }
+        
+        if (minAngezeigt <= maxAngezeigt) {
+          bereichAnzeige = `${minAngezeigt.toFixed(2)} – ${maxAngezeigt.toFixed(2)}`;
+        } else {
+          bereichAnzeige = '—';
+        }
       }
     }
+    
     htmlString += `<tr>
       <td>${note}</td>
       <td>${punktzahl}</td>
       <td>${bereichAnzeige}</td>
     </tr>`;
   }
+  
   tbody.innerHTML = htmlString;
 }
 
 tabelleAktualisieren();
-inputElement.addEventListener('input', tabelleAktualisieren);
