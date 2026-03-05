@@ -41,52 +41,74 @@ function tabelleAktualisieren() {
   const gueltig = !isNaN(maxPunkte) && maxPunkte > 0;
   const istUngerundet = ungerundetCheckbox.checked;
   const istAufrunden = !istUngerundet && rundungToggle.checked;
-  
+
   let htmlString = '';
-  
-  for (let n of noten) {
-    const note = n.note;
-    const punktzahl = n.punkte;
-    let bereichAnzeige = '—';
-    
-    if (gueltig) {
+
+  if (!gueltig) {
+    for (let n of noten) {
+      htmlString += `<tr>
+        <td>${n.note}</td>
+        <td>${n.punkte}</td>
+        <td>—</td>
+      </tr>`;
+    }
+    tbody.innerHTML = htmlString;
+    return;
+  }
+
+  if (istUngerundet) {
+    for (let n of noten) {
       const minExakt = (n.minProz / 100) * maxPunkte;
       const maxExakt = (n.maxProz / 100) * maxPunkte;
-      
-      if (istUngerundet) {
-        const minAngezeigt = minExakt;
-        const maxAngezeigt = maxExakt;
-        if (minAngezeigt <= maxAngezeigt) {
-          bereichAnzeige = `${minAngezeigt.toFixed(2)} – ${maxAngezeigt.toFixed(2)}`;
-        } else {
-          bereichAnzeige = '—';
-        }
-      } else if (istAufrunden) {
-        const minAngezeigt = Math.ceil(minExakt);
-        const maxAngezeigt = Math.ceil(maxExakt);
-        if (minAngezeigt <= maxAngezeigt) {
-          bereichAnzeige = `${minAngezeigt} – ${maxAngezeigt}`;
-        } else {
-          bereichAnzeige = '—';
-        }
+      if (minExakt <= maxExakt) {
+        htmlString += `<tr>
+          <td>${n.note}</td>
+          <td>${n.punkte}</td>
+          <td>${minExakt.toFixed(2)} – ${maxExakt.toFixed(2)}</td>
+        </tr>`;
       } else {
-        const minAngezeigt = Math.floor(minExakt);
-        const maxAngezeigt = Math.floor(maxExakt);
-        if (minAngezeigt <= maxAngezeigt) {
-          bereichAnzeige = `${minAngezeigt} – ${maxAngezeigt}`;
-        } else {
-          bereichAnzeige = '—';
+        htmlString += `<tr>
+          <td>${n.note}</td>
+          <td>${n.punkte}</td>
+          <td>—</td>
+        </tr>`;
+      }
+    }
+  } else {
+    // Auf‑ oder Abrunden: Jede ganze Punktzahl einer Note zuordnen
+    let noteMin = new Array(noten.length).fill(Infinity);
+    let noteMax = new Array(noten.length).fill(-Infinity);
+
+    for (let punktzahl = 0; punktzahl <= maxPunkte; punktzahl++) {
+      const prozentExakt = (punktzahl / maxPunkte) * 100;
+      const prozentGerundet = istAufrunden ? Math.ceil(prozentExakt) : Math.floor(prozentExakt);
+
+      for (let i = 0; i < noten.length; i++) {
+        if (prozentGerundet >= noten[i].minProz && prozentGerundet <= noten[i].maxProz) {
+          noteMin[i] = Math.min(noteMin[i], punktzahl);
+          noteMax[i] = Math.max(noteMax[i], punktzahl);
+          break;
         }
       }
     }
-    
-    htmlString += `<tr>
-      <td>${note}</td>
-      <td>${punktzahl}</td>
-      <td>${bereichAnzeige}</td>
-    </tr>`;
+
+    for (let i = 0; i < noten.length; i++) {
+      if (noteMin[i] <= noteMax[i]) {
+        htmlString += `<tr>
+          <td>${noten[i].note}</td>
+          <td>${noten[i].punkte}</td>
+          <td>${noteMin[i]} – ${noteMax[i]}</td>
+        </tr>`;
+      } else {
+        htmlString += `<tr>
+          <td>${noten[i].note}</td>
+          <td>${noten[i].punkte}</td>
+          <td>—</td>
+        </tr>`;
+      }
+    }
   }
-  
+
   tbody.innerHTML = htmlString;
 }
 
@@ -105,7 +127,7 @@ downloadBtn.addEventListener('click', function() {
   const filename = `notentabelle_${maxPunkte}p_${modus}.png`;
 
   const table = document.querySelector('table');
-  
+
   html2canvas(table, {
     scale: 2,
     backgroundColor: '#ffffff'
