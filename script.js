@@ -17,36 +17,6 @@ const noten = [
   { note: '6',  punkte: 0,  minProz: 0,  maxProz: 19 }
 ];
 
-function berechneLueckenloseNoten() {
-  let sortiert = [...noten].sort((a, b) => a.minProz - b.minProz);
-  let neue = [];
-  for (let i = 0; i < sortiert.length; i++) {
-    let aktuell = sortiert[i];
-    let vorher = sortiert[i - 1];
-    let nachher = sortiert[i + 1];
-    let min, max;
-    if (i === 0) {
-      min = 0;
-      max = (aktuell.maxProz + (nachher ? nachher.minProz : 100)) / 2;
-    } else if (i === sortiert.length - 1) {
-      min = (vorher.maxProz + aktuell.minProz) / 2;
-      max = 100;
-    } else {
-      min = (vorher.maxProz + aktuell.minProz) / 2;
-      max = (aktuell.maxProz + nachher.minProz) / 2;
-    }
-    neue.push({
-      note: aktuell.note,
-      punkte: aktuell.punkte,
-      minProz: min,
-      maxProz: max
-    });
-  }
-  return neue.sort((a, b) => b.punkte - a.punkte);
-}
-
-const lueckenloseNoten = berechneLueckenloseNoten();
-
 const inputElement = document.getElementById('maxPunkte');
 const tbody = document.getElementById('tabellenKoerper');
 const ungerundetCheckbox = document.getElementById('ungerundetCheckbox');
@@ -75,7 +45,7 @@ function tabelleAktualisieren() {
   let htmlString = '';
 
   if (!gueltig) {
-    for (let n of lueckenloseNoten) {
+    for (let n of noten) {
       htmlString += `<tr>
         <td>${n.note}</td>
         <td>${n.punkte}</td>
@@ -87,7 +57,7 @@ function tabelleAktualisieren() {
   }
 
   if (istUngerundet) {
-    for (let n of lueckenloseNoten) {
+    for (let n of noten) {
       const minExakt = (n.minProz / 100) * maxPunkte;
       const maxExakt = (n.maxProz / 100) * maxPunkte;
       htmlString += `<tr>
@@ -97,22 +67,16 @@ function tabelleAktualisieren() {
       </tr>`;
     }
   } else {
-    let noteMin = new Array(lueckenloseNoten.length).fill(Infinity);
-    let noteMax = new Array(lueckenloseNoten.length).fill(-Infinity);
+    let noteMin = new Array(noten.length).fill(Infinity);
+    let noteMax = new Array(noten.length).fill(-Infinity);
 
     for (let punktzahl = 0; punktzahl <= maxPunkte; punktzahl++) {
       const prozentExakt = (punktzahl / maxPunkte) * 100;
       const prozentGerundet = istAufrunden ? Math.ceil(prozentExakt) : Math.floor(prozentExakt);
 
-      for (let i = 0; i < lueckenloseNoten.length; i++) {
-        const n = lueckenloseNoten[i];
-        let inRange;
-        if (i === lueckenloseNoten.length - 1) {
-          inRange = prozentGerundet >= n.minProz && prozentGerundet <= n.maxProz;
-        } else {
-          inRange = prozentGerundet >= n.minProz && prozentGerundet < n.maxProz;
-        }
-        if (inRange) {
+      for (let i = 0; i < noten.length; i++) {
+        const n = noten[i];
+        if (prozentGerundet >= n.minProz && prozentGerundet <= n.maxProz) {
           noteMin[i] = Math.min(noteMin[i], punktzahl);
           noteMax[i] = Math.max(noteMax[i], punktzahl);
           break;
@@ -120,17 +84,17 @@ function tabelleAktualisieren() {
       }
     }
 
-    for (let i = 0; i < lueckenloseNoten.length; i++) {
+    for (let i = 0; i < noten.length; i++) {
       if (noteMin[i] <= noteMax[i]) {
         htmlString += `<tr>
-          <td>${lueckenloseNoten[i].note}</td>
-          <td>${lueckenloseNoten[i].punkte}</td>
+          <td>${noten[i].note}</td>
+          <td>${noten[i].punkte}</td>
           <td>${noteMin[i]} – ${noteMax[i]}</td>
         </tr>`;
       } else {
         htmlString += `<tr>
-          <td>${lueckenloseNoten[i].note}</td>
-          <td>${lueckenloseNoten[i].punkte}</td>
+          <td>${noten[i].note}</td>
+          <td>${noten[i].punkte}</td>
           <td>—</td>
         </tr>`;
       }
