@@ -20,140 +20,58 @@ const noten = [
 const inputElement = document.getElementById('maxPunkte');
 const tbody = document.getElementById('tabellenKoerper');
 const ungerundetCheckbox = document.getElementById('ungerundetCheckbox');
-const toggleRow = document.getElementById('toggleRow');
 const rundungToggle = document.getElementById('rundungToggle');
-const downloadBtn = document.getElementById('downloadBtn');
 
-ungerundetCheckbox.addEventListener('change', () => {
-  toggleRow.classList.toggle('hidden', ungerundetCheckbox.checked);
-  tabelleAktualisieren();
-});
-
-rundungToggle.addEventListener('change', tabelleAktualisieren);
 inputElement.addEventListener('input', tabelleAktualisieren);
-
-function findeNote(prozent) {
-  for (let n of noten) {
-    if (prozent >= n.minProz && prozent <= n.maxProz) {
-      return n;
-    }
-  }
-  return null;
-}
+ungerundetCheckbox.addEventListener('change', tabelleAktualisieren);
+rundungToggle.addEventListener('change', tabelleAktualisieren);
 
 function tabelleAktualisieren() {
 
   const maxPunkte = parseInt(inputElement.value, 10);
-  const istUngerundet = ungerundetCheckbox.checked;
-  const istAufrunden = rundungToggle.checked;
 
   if (!maxPunkte || maxPunkte <= 0) {
-    tbody.innerHTML = noten.map(n => `
-      <tr>
-        <td>${n.note}</td>
-        <td>${n.punkte}</td>
-        <td>—</td>
-      </tr>`).join('');
+    tbody.innerHTML = '';
     return;
   }
 
-  const noteMin = new Array(noten.length).fill(Infinity);
-  const noteMax = new Array(noten.length).fill(-Infinity);
-
-  for (let punkte = 0; punkte <= maxPunkte; punkte++) {
-
-    let prozent = (punkte / maxPunkte) * 100;
-
-    if (!istUngerundet) {
-      prozent = istAufrunden
-        ? Math.ceil(prozent)
-        : Math.floor(prozent);
-    }
-
-    const note = findeNote(prozent);
-    if (!note) continue;
-
-    const index = noten.indexOf(note);
-
-    noteMin[index] = Math.min(noteMin[index], punkte);
-    noteMax[index] = Math.max(noteMax[index], punkte);
-  }
+  const ungerundet = ungerundetCheckbox.checked;
+  const aufrunden = rundungToggle.checked;
 
   let html = '';
 
-  for (let i = 0; i < noten.length; i++) {
+  for (let n of noten) {
 
-    if (noteMin[i] <= noteMax[i]) {
+    let min = (n.minProz / 100) * maxPunkte;
+    let max = (n.maxProz / 100) * maxPunkte;
 
-      let wert;
+    if (!ungerundet) {
 
-      if (istUngerundet) {
-
-        const min = ((noteMin[i] / maxPunkte) * 100).toFixed(2);
-        const max = ((noteMax[i] / maxPunkte) * 100).toFixed(2);
-
-        wert = `${min}% – ${max}%`;
-
+      if (aufrunden) {
+        min = Math.ceil(min);
+        max = Math.ceil(max);
       } else {
-
-        wert = `${noteMin[i]} – ${noteMax[i]}`;
-
+        min = Math.floor(min);
+        max = Math.floor(max);
       }
-
-      html += `
-      <tr>
-        <td>${noten[i].note}</td>
-        <td>${noten[i].punkte}</td>
-        <td>${wert}</td>
-      </tr>`;
 
     } else {
 
-      html += `
-      <tr>
-        <td>${noten[i].note}</td>
-        <td>${noten[i].punkte}</td>
-        <td>—</td>
-      </tr>`;
+      min = min.toFixed(2);
+      max = max.toFixed(2);
+
     }
+
+    html += `
+      <tr>
+        <td>${n.note}</td>
+        <td>${n.punkte}</td>
+        <td>${min} – ${max}</td>
+      </tr>
+    `;
   }
 
   tbody.innerHTML = html;
 }
-
-function getRundungsModus() {
-  if (ungerundetCheckbox.checked) return 'ungerundet';
-  return rundungToggle.checked ? 'aufgerundet' : 'abgerundet';
-}
-
-downloadBtn.addEventListener('click', function() {
-
-  const maxPunkte = inputElement.value.trim();
-
-  if (!maxPunkte || parseInt(maxPunkte) <= 0) {
-    alert('Bitte gültige Maximalpunktzahl eingeben.');
-    return;
-  }
-
-  const modus = getRundungsModus();
-  const filename = `notentabelle_${maxPunkte}p_${modus}.png`;
-
-  const table = document.querySelector('table');
-
-  html2canvas(table, {
-    scale: 2,
-    backgroundColor: '#ffffff'
-  }).then(canvas => {
-
-    const link = document.createElement('a');
-    link.download = filename;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-
-  }).catch(err => {
-    console.error(err);
-    alert('Fehler beim Erstellen des Bildes.');
-  });
-});
 
 tabelleAktualisieren();
