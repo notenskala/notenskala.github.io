@@ -57,16 +57,39 @@ function tabelleAktualisieren() {
   }
 
   if (istUngerundet) {
-    for (let n of noten) {
-      const minExakt = (n.minProz / 100) * maxPunkte;
-      const maxExakt = (n.maxProz / 100) * maxPunkte;
+    // Exakte Punkte aus den Prozenten berechnen
+    let minPunkte = noten.map(n => (n.minProz / 100) * maxPunkte);
+    let maxPunkteArr = noten.map(n => (n.maxProz / 100) * maxPunkte);
+
+    // Auf zwei Nachkommastellen runden
+    minPunkte = minPunkte.map(v => Math.round(v * 100) / 100);
+    maxPunkteArr = maxPunkteArr.map(v => Math.round(v * 100) / 100);
+
+    // Überschneidungen korrigieren: Die bessere Note (höhere Punktzahl) bekommt den gemeinsamen Grenzwert,
+    // die schlechtere Note beginnt beim nächsthöheren Wert.
+    for (let i = 0; i < noten.length - 1; i++) {
+      // i ist die bessere Note (oben in der Liste), i+1 die schlechtere
+      if (maxPunkteArr[i] >= minPunkte[i + 1]) {
+        // Grenze verschieben: Die schlechtere Note beginnt bei maxPunkte[i] + 0.01
+        minPunkte[i + 1] = maxPunkteArr[i] + 0.01;
+        // Erneut auf zwei Stellen runden (wegen Rundungsfehlern)
+        minPunkte[i + 1] = Math.round(minPunkte[i + 1] * 100) / 100;
+      }
+    }
+
+    // Ausgabe
+    for (let i = 0; i < noten.length; i++) {
+      const n = noten[i];
+      const min = minPunkte[i].toFixed(2);
+      const max = maxPunkteArr[i].toFixed(2);
       htmlString += `<tr>
         <td>${n.note}</td>
         <td>${n.punkte}</td>
-        <td>${minExakt.toFixed(2)} – ${maxExakt.toFixed(2)}</td>
+        <td>${min} – ${max}</td>
       </tr>`;
     }
   } else {
+    // Auf‑ oder Abrunden: Jede ganze Punktzahl einer Note zuordnen (unverändert)
     let noteMin = new Array(noten.length).fill(Infinity);
     let noteMax = new Array(noten.length).fill(-Infinity);
 
