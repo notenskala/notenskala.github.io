@@ -36,34 +36,6 @@ ungerundetCheckbox.addEventListener('change', function() {
 rundungToggle.addEventListener('change', tabelleAktualisieren);
 inputElement.addEventListener('input', tabelleAktualisieren);
 
-function berechneLueckenloseProzentbereiche() {
-  let sortiert = [...noten].sort((a, b) => a.minProz - b.minProz);
-  let neueNoten = [];
-  for (let i = 0; i < sortiert.length; i++) {
-    let aktuell = sortiert[i];
-    let vorher = sortiert[i - 1];
-    let nachher = sortiert[i + 1];
-    let min, max;
-    if (i === 0) {
-      min = 0;
-      max = (aktuell.maxProz + (nachher ? nachher.minProz : 100)) / 2;
-    } else if (i === sortiert.length - 1) {
-      min = (vorher.maxProz + aktuell.minProz) / 2;
-      max = 100;
-    } else {
-      min = (vorher.maxProz + aktuell.minProz) / 2;
-      max = (aktuell.maxProz + nachher.minProz) / 2;
-    }
-    neueNoten.push({
-      note: aktuell.note,
-      punkte: aktuell.punkte,
-      minProz: min,
-      maxProz: max
-    });
-  }
-  return neueNoten.sort((a, b) => b.punkte - a.punkte);
-}
-
 function tabelleAktualisieren() {
   let maxPunkte = parseInt(inputElement.value, 10);
   const gueltig = !isNaN(maxPunkte) && maxPunkte > 0;
@@ -85,17 +57,25 @@ function tabelleAktualisieren() {
   }
 
   if (istUngerundet) {
-    const lueckenloseNoten = berechneLueckenloseProzentbereiche();
-    for (let n of lueckenloseNoten) {
+    for (let n of noten) {
       const minExakt = (n.minProz / 100) * maxPunkte;
       const maxExakt = (n.maxProz / 100) * maxPunkte;
-      htmlString += `<tr>
-        <td>${n.note}</td>
-        <td>${n.punkte}</td>
-        <td>${minExakt.toFixed(2)} – ${maxExakt.toFixed(2)}</td>
-      </tr>`;
+      if (minExakt <= maxExakt) {
+        htmlString += `<tr>
+          <td>${n.note}</td>
+          <td>${n.punkte}</td>
+          <td>${minExakt.toFixed(2)} – ${maxExakt.toFixed(2)}</td>
+        </tr>`;
+      } else {
+        htmlString += `<tr>
+          <td>${n.note}</td>
+          <td>${n.punkte}</td>
+          <td>—</td>
+        </tr>`;
+      }
     }
   } else {
+    // Auf‑ oder Abrunden: Jede ganze Punktzahl einer Note zuordnen
     let noteMin = new Array(noten.length).fill(Infinity);
     let noteMax = new Array(noten.length).fill(-Infinity);
 
