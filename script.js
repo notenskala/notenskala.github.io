@@ -17,6 +17,36 @@ const noten = [
   { note: '6',  punkte: 0,  minProz: 0,  maxProz: 19 }
 ];
 
+function berechneLueckenloseNoten() {
+  let sortiert = [...noten].sort((a, b) => a.minProz - b.minProz);
+  let neue = [];
+  for (let i = 0; i < sortiert.length; i++) {
+    let aktuell = sortiert[i];
+    let vorher = sortiert[i - 1];
+    let nachher = sortiert[i + 1];
+    let min, max;
+    if (i === 0) {
+      min = 0;
+      max = (aktuell.maxProz + (nachher ? nachher.minProz : 100)) / 2;
+    } else if (i === sortiert.length - 1) {
+      min = (vorher.maxProz + aktuell.minProz) / 2;
+      max = 100;
+    } else {
+      min = (vorher.maxProz + aktuell.minProz) / 2;
+      max = (aktuell.maxProz + nachher.minProz) / 2;
+    }
+    neue.push({
+      note: aktuell.note,
+      punkte: aktuell.punkte,
+      minProz: min,
+      maxProz: max
+    });
+  }
+  return neue.sort((a, b) => b.punkte - a.punkte);
+}
+
+const lueckenloseNoten = berechneLueckenloseNoten();
+
 const inputElement = document.getElementById('maxPunkte');
 const tbody = document.getElementById('tabellenKoerper');
 const ungerundetCheckbox = document.getElementById('ungerundetCheckbox');
@@ -45,7 +75,7 @@ function tabelleAktualisieren() {
   let htmlString = '';
 
   if (!gueltig) {
-    for (let n of noten) {
+    for (let n of lueckenloseNoten) {
       htmlString += `<tr>
         <td>${n.note}</td>
         <td>${n.punkte}</td>
@@ -57,34 +87,32 @@ function tabelleAktualisieren() {
   }
 
   if (istUngerundet) {
-    for (let n of noten) {
+    for (let n of lueckenloseNoten) {
       const minExakt = (n.minProz / 100) * maxPunkte;
       const maxExakt = (n.maxProz / 100) * maxPunkte;
-      if (minExakt <= maxExakt) {
-        htmlString += `<tr>
-          <td>${n.note}</td>
-          <td>${n.punkte}</td>
-          <td>${minExakt.toFixed(2)} – ${maxExakt.toFixed(2)}</td>
-        </tr>`;
-      } else {
-        htmlString += `<tr>
-          <td>${n.note}</td>
-          <td>${n.punkte}</td>
-          <td>—</td>
-        </tr>`;
-      }
+      htmlString += `<tr>
+        <td>${n.note}</td>
+        <td>${n.punkte}</td>
+        <td>${minExakt.toFixed(2)} – ${maxExakt.toFixed(2)}</td>
+      </tr>`;
     }
   } else {
-    // Auf‑ oder Abrunden: Jede ganze Punktzahl einer Note zuordnen
-    let noteMin = new Array(noten.length).fill(Infinity);
-    let noteMax = new Array(noten.length).fill(-Infinity);
+    let noteMin = new Array(lueckenloseNoten.length).fill(Infinity);
+    let noteMax = new Array(lueckenloseNoten.length).fill(-Infinity);
 
     for (let punktzahl = 0; punktzahl <= maxPunkte; punktzahl++) {
       const prozentExakt = (punktzahl / maxPunkte) * 100;
       const prozentGerundet = istAufrunden ? Math.ceil(prozentExakt) : Math.floor(prozentExakt);
 
-      for (let i = 0; i < noten.length; i++) {
-        if (prozentGerundet >= noten[i].minProz && prozentGerundet <= noten[i].maxProz) {
+      for (let i = 0; i < lueckenloseNoten.length; i++) {
+        const n = lueckenloseNoten[i];
+        let inRange;
+        if (i === lueckenloseNoten.length - 1) {
+          inRange = prozentGerundet >= n.minProz && prozentGerundet <= n.maxProz;
+        } else {
+          inRange = prozentGerundet >= n.minProz && prozentGerundet < n.maxProz;
+        }
+        if (inRange) {
           noteMin[i] = Math.min(noteMin[i], punktzahl);
           noteMax[i] = Math.max(noteMax[i], punktzahl);
           break;
@@ -92,17 +120,17 @@ function tabelleAktualisieren() {
       }
     }
 
-    for (let i = 0; i < noten.length; i++) {
+    for (let i = 0; i < lueckenloseNoten.length; i++) {
       if (noteMin[i] <= noteMax[i]) {
         htmlString += `<tr>
-          <td>${noten[i].note}</td>
-          <td>${noten[i].punkte}</td>
+          <td>${lueckenloseNoten[i].note}</td>
+          <td>${lueckenloseNoten[i].punkte}</td>
           <td>${noteMin[i]} – ${noteMax[i]}</td>
         </tr>`;
       } else {
         htmlString += `<tr>
-          <td>${noten[i].note}</td>
-          <td>${noten[i].punkte}</td>
+          <td>${lueckenloseNoten[i].note}</td>
+          <td>${lueckenloseNoten[i].punkte}</td>
           <td>—</td>
         </tr>`;
       }
