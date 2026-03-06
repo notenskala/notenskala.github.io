@@ -37,17 +37,17 @@ rundungToggle.addEventListener('change', tabelleAktualisieren);
 inputElement.addEventListener('input', tabelleAktualisieren);
 
 function berechneLueckenloseProzentbereiche() {
-  let notenSorted = [...noten].sort((a, b) => a.minProz - b.minProz);
+  let sortiert = [...noten].sort((a, b) => a.minProz - b.minProz);
   let neueNoten = [];
-  for (let i = 0; i < notenSorted.length; i++) {
-    let aktuell = notenSorted[i];
-    let vorher = notenSorted[i - 1];
-    let nachher = notenSorted[i + 1];
+  for (let i = 0; i < sortiert.length; i++) {
+    let aktuell = sortiert[i];
+    let vorher = sortiert[i - 1];
+    let nachher = sortiert[i + 1];
     let min, max;
     if (i === 0) {
       min = 0;
       max = (aktuell.maxProz + (nachher ? nachher.minProz : 100)) / 2;
-    } else if (i === notenSorted.length - 1) {
+    } else if (i === sortiert.length - 1) {
       min = (vorher.maxProz + aktuell.minProz) / 2;
       max = 100;
     } else {
@@ -87,14 +87,12 @@ function tabelleAktualisieren() {
   if (istUngerundet) {
     const lueckenloseNoten = berechneLueckenloseProzentbereiche();
     for (let n of lueckenloseNoten) {
-      const minPunkte = (n.minProz / 100) * maxPunkte;
-      const maxPunkteBerechnet = (n.maxProz / 100) * maxPunkte;
-      const minAngezeigt = minPunkte.toFixed(2);
-      const maxAngezeigt = maxPunkteBerechnet.toFixed(2);
+      const minExakt = (n.minProz / 100) * maxPunkte;
+      const maxExakt = (n.maxProz / 100) * maxPunkte;
       htmlString += `<tr>
         <td>${n.note}</td>
         <td>${n.punkte}</td>
-        <td>${minAngezeigt} – ${maxAngezeigt}</td>
+        <td>${minExakt.toFixed(2)} – ${maxExakt.toFixed(2)}</td>
       </tr>`;
     }
   } else {
