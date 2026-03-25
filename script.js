@@ -20,27 +20,48 @@ const noten = [
 const inputElement = document.getElementById('maxPunkte');
 const tbody = document.getElementById('tabellenKoerper');
 const ungerundetCheckbox = document.getElementById('ungerundetCheckbox');
+const halbRundenCheckbox = document.getElementById('halbRundenCheckbox');
 const toggleRow = document.getElementById('toggleRow');
 const rundungToggle = document.getElementById('rundungToggle');
 const downloadBtn = document.getElementById('downloadBtn');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const downloadTableBtn = document.getElementById('downloadTableBtn');
+const downloadSpiegelBtn = document.getElementById('downloadSpiegelBtn');
+
+downloadBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  dropdownMenu.classList.toggle('show');
+});
+
+document.addEventListener('click', (e) => {
+  if (!downloadBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+    dropdownMenu.classList.remove('show');
+  }
+});
 
 ungerundetCheckbox.addEventListener('change', function() {
   if (this.checked) {
     toggleRow.classList.add('hidden');
+    halbRundenCheckbox.disabled = true;
+    halbRundenCheckbox.parentElement.classList.add('disabled');
   } else {
     toggleRow.classList.remove('hidden');
+    halbRundenCheckbox.disabled = false;
+    halbRundenCheckbox.parentElement.classList.remove('disabled');
   }
   tabelleAktualisieren();
 });
 
 rundungToggle.addEventListener('change', tabelleAktualisieren);
+halbRundenCheckbox.addEventListener('change', tabelleAktualisieren);
 inputElement.addEventListener('input', tabelleAktualisieren);
 
 function tabelleAktualisieren() {
   let maxPunkte = parseInt(inputElement.value, 10);
   const gueltig = !isNaN(maxPunkte) && maxPunkte > 0;
   const istUngerundet = ungerundetCheckbox.checked;
-  const istAufrunden = !istUngerundet && rundungToggle.checked;
+  const istHalbRunden = !istUngerundet && halbRundenCheckbox.checked;
+  const istAufrunden = !istUngerundet && !istHalbRunden && rundungToggle.checked;
 
   if (!gueltig) {
     tbody.innerHTML = '';
@@ -51,14 +72,16 @@ function tabelleAktualisieren() {
     const exakt = (n.minProz / 100) * maxPunkte;
     if (istUngerundet) {
       return exakt;
+    } else if (istHalbRunden) {
+      return Math.round(exakt * 2) / 2;
     } else {
       return istAufrunden ? Math.ceil(exakt) : Math.floor(exakt);
     }
   });
 
+  const delta = istUngerundet ? 0.01 : (istHalbRunden ? 0.5 : 1);
   const maxWerte = new Array(noten.length);
   maxWerte[0] = maxPunkte;
-  const delta = istUngerundet ? 0.01 : 1;
   for (let i = 1; i < noten.length; i++) {
     maxWerte[i] = minWerte[i - 1] - delta;
   }
@@ -75,16 +98,20 @@ function tabelleAktualisieren() {
     if (minWert <= maxWert) {
       if (istUngerundet) {
         bereichAnzeige = `${minWert.toFixed(2)} – ${maxWert.toFixed(2)}`;
+      } else if (istHalbRunden) {
+        bereichAnzeige = `${minWert.toFixed(1)} – ${maxWert.toFixed(1)}`;
       } else {
         bereichAnzeige = `${Math.floor(minWert)} – ${Math.floor(maxWert)}`;
       }
     }
 
-    htmlString += `<tr>
-      <td>${note}</td>
-      <td>${punktzahl}</td>
-      <td>${bereichAnzeige}</td>
-    </tr>`;
+    htmlString += `
+      <tr>
+        <td>${note}</td>
+        <td>${punktzahl}</td>
+        <td>${bereichAnzeige}</td>
+      </tr>
+    `;
   }
 
   tbody.innerHTML = htmlString;
@@ -92,10 +119,11 @@ function tabelleAktualisieren() {
 
 function getRundungsModus() {
   if (ungerundetCheckbox.checked) return 'ungerundet';
+  if (halbRundenCheckbox.checked) return 'halbgerundet';
   return rundungToggle.checked ? 'aufgerundet' : 'abgerundet';
 }
 
-downloadBtn.addEventListener('click', function() {
+downloadTableBtn.addEventListener('click', function() {
   const maxPunkte = inputElement.value.trim();
   if (maxPunkte === '' || isNaN(parseInt(maxPunkte, 10)) || parseInt(maxPunkte, 10) <= 0) {
     alert('Bitte gültige Maximalpunktzahl eingeben.');
@@ -114,9 +142,97 @@ downloadBtn.addEventListener('click', function() {
     link.download = filename;
     link.href = canvas.toDataURL('image/png');
     link.click();
+    dropdownMenu.classList.remove('show');
   }).catch(error => {
     console.error('Fehler beim Erstellen des Bildes:', error);
     alert('Fehler beim Erstellen des Bildes. Bitte versuche es erneut.');
+  });
+});
+
+downloadSpiegelBtn.addEventListener('click', function() {
+  const maxPunkte = inputElement.value.trim();
+  if (maxPunkte === '' || isNaN(parseInt(maxPunkte, 10)) || parseInt(maxPunkte, 10) <= 0) {
+    alert('Bitte gültige Maximalpunktzahl eingeben.');
+    return;
+  }
+
+  const rows = tbody.querySelectorAll('tr');
+  const bereiche = [];
+  for (let row of rows) {
+    const td = row.cells[2];
+    if (td) {
+      bereiche.push(td.innerText.trim());
+    }
+  }
+  const punkte = noten.map(n => n.punkte);
+
+  const wrapper = document.createElement('div');
+  wrapper.style.padding = '20px';
+  wrapper.style.backgroundColor = 'white';
+  wrapper.style.fontFamily = 'system-ui, sans-serif';
+  wrapper.style.display = 'inline-block';
+  wrapper.style.borderRadius = '8px';
+  wrapper.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+
+  const table = document.createElement('table');
+  table.style.borderCollapse = 'collapse';
+  table.style.width = '100%';
+  table.style.minWidth = '600px';
+
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  for (let p of punkte) {
+    const th = document.createElement('th');
+    th.textContent = p;
+    th.style.padding = '8px 12px';
+    th.style.border = '1px solid #ccc';
+    th.style.backgroundColor = '#f0f0f0';
+    th.style.fontWeight = '600';
+    th.style.textAlign = 'center';
+    headerRow.appendChild(th);
+  }
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbodySpiegel = document.createElement('tbody');
+  const dataRow = document.createElement('tr');
+  for (let b of bereiche) {
+    const td = document.createElement('td');
+    td.textContent = b;
+    td.style.padding = '8px 12px';
+    td.style.border = '1px solid #ccc';
+    td.style.textAlign = 'center';
+    td.style.backgroundColor = '#fff';
+    dataRow.appendChild(td);
+  }
+  tbodySpiegel.appendChild(dataRow);
+  table.appendChild(tbodySpiegel);
+
+  wrapper.appendChild(table);
+
+  const title = document.createElement('h3');
+  title.textContent = `Klausurspiegel (max. ${maxPunkte} Punkte)`;
+  title.style.margin = '0 0 15px 0';
+  title.style.textAlign = 'center';
+  wrapper.insertBefore(title, wrapper.firstChild);
+
+  document.body.appendChild(wrapper);
+
+  html2canvas(wrapper, {
+    scale: 2,
+    backgroundColor: '#ffffff'
+  }).then(canvas => {
+    const link = document.createElement('a');
+    const modus = getRundungsModus();
+    link.download = `klausurspiegel_${maxPunkte}p_${modus}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    document.body.removeChild(wrapper);
+    dropdownMenu.classList.remove('show');
+  }).catch(error => {
+    console.error('Fehler beim Erstellen des Klausurspiegels:', error);
+    alert('Fehler beim Erstellen des Klausurspiegels.');
+    document.body.removeChild(wrapper);
   });
 });
 
