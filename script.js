@@ -1,51 +1,21 @@
 const noten = [
   { note: '1+', punkte: 15, minProz: 95, maxProz: 100 },
-  { note: '1',  punkte: 14, minProz: 90, maxProz: 94.99 },
-  { note: '1-', punkte: 13, minProz: 85, maxProz: 89.99 },
-  { note: '2+', punkte: 12, minProz: 80, maxProz: 84.99 },
-  { note: '2',  punkte: 11, minProz: 75, maxProz: 79.99 },
-  { note: '2-', punkte: 10, minProz: 70, maxProz: 74.99 },
-  { note: '3+', punkte: 9,  minProz: 65, maxProz: 69.99 },
-  { note: '3',  punkte: 8,  minProz: 60, maxProz: 64.99 },
-  { note: '3-', punkte: 7,  minProz: 55, maxProz: 59.99 },
-  { note: '4+', punkte: 6,  minProz: 50, maxProz: 54.99 },
-  { note: '4',  punkte: 5,  minProz: 45, maxProz: 49.99 },
-  { note: '4-', punkte: 4,  minProz: 40, maxProz: 44.99 },
-  { note: '5+', punkte: 3,  minProz: 33, maxProz: 39.99 },
-  { note: '5',  punkte: 2,  minProz: 27, maxProz: 32.99 },
-  { note: '5-', punkte: 1,  minProz: 20, maxProz: 26.99 },
-  { note: '6',  punkte: 0,  minProz: 0,  maxProz: 19.99 }
+  { note: '1',  punkte: 14, minProz: 90, maxProz: 94 },
+  { note: '1-', punkte: 13, minProz: 85, maxProz: 89 },
+  { note: '2+', punkte: 12, minProz: 80, maxProz: 84 },
+  { note: '2',  punkte: 11, minProz: 75, maxProz: 79 },
+  { note: '2-', punkte: 10, minProz: 70, maxProz: 74 },
+  { note: '3+', punkte: 9,  minProz: 65, maxProz: 69 },
+  { note: '3',  punkte: 8,  minProz: 60, maxProz: 64 },
+  { note: '3-', punkte: 7,  minProz: 55, maxProz: 59 },
+  { note: '4+', punkte: 6,  minProz: 50, maxProz: 54 },
+  { note: '4',  punkte: 5,  minProz: 45, maxProz: 49 },
+  { note: '4-', punkte: 4,  minProz: 40, maxProz: 44 },
+  { note: '5+', punkte: 3,  minProz: 33, maxProz: 39 },
+  { note: '5',  punkte: 2,  minProz: 27, maxProz: 32 },
+  { note: '5-', punkte: 1,  minProz: 20, maxProz: 26 },
+  { note: '6',  punkte: 0,  minProz: 0,  maxProz: 19 }
 ];
-
-function berechneLueckenloseNoten() {
-  const sortiert = [...noten].sort((a, b) => a.minProz - b.minProz);
-  const lueckenlos = [];
-  for (let i = 0; i < sortiert.length; i++) {
-    const aktuell = sortiert[i];
-    const vorher = sortiert[i - 1];
-    const nachher = sortiert[i + 1];
-    let minProz, maxProz;
-    if (i === 0) {
-      minProz = 0;
-      maxProz = (aktuell.maxProz + nachher.minProz) / 2;
-    } else if (i === sortiert.length - 1) {
-      minProz = (vorher.maxProz + aktuell.minProz) / 2;
-      maxProz = 100;
-    } else {
-      minProz = (vorher.maxProz + aktuell.minProz) / 2;
-      maxProz = (aktuell.maxProz + nachher.minProz) / 2;
-    }
-    lueckenlos.push({
-      note: aktuell.note,
-      punkte: aktuell.punkte,
-      minProz: minProz,
-      maxProz: maxProz
-    });
-  }
-  return lueckenlos.sort((a, b) => b.punkte - a.punkte);
-}
-
-const lueckenloseNoten = berechneLueckenloseNoten();
 
 const inputElement = document.getElementById('maxPunkte');
 const tbody = document.getElementById('tabellenKoerper');
@@ -71,68 +41,52 @@ function tabelleAktualisieren() {
   const gueltig = !isNaN(maxPunkte) && maxPunkte > 0;
   const istUngerundet = ungerundetCheckbox.checked;
   const istAufrunden = !istUngerundet && rundungToggle.checked;
-
+  
   let htmlString = '';
-
-  if (!gueltig) {
-    for (let n of noten) {
-      htmlString += `<tr>
-        <td>${n.note}</td>
-        <td>${n.punkte}</td>
-        <td>—</td>
-      </tr>`;
-    }
-    tbody.innerHTML = htmlString;
-    return;
-  }
-
-  if (istUngerundet) {
-    for (let n of lueckenloseNoten) {
+  
+  for (let n of noten) {
+    const note = n.note;
+    const punktzahl = n.punkte;
+    let bereichAnzeige = '—';
+    
+    if (gueltig) {
       const minExakt = (n.minProz / 100) * maxPunkte;
       const maxExakt = (n.maxProz / 100) * maxPunkte;
-      const minAngezeigt = minExakt.toFixed(2);
-      const maxAngezeigt = maxExakt.toFixed(2);
-      htmlString += `<tr>
-        <td>${n.note}</td>
-        <td>${n.punkte}</td>
-        <td>${minAngezeigt} – ${maxAngezeigt}</td>
-      </tr>`;
-    }
-  } else {
-    let noteMin = new Array(noten.length).fill(Infinity);
-    let noteMax = new Array(noten.length).fill(-Infinity);
-
-    for (let punktzahl = 0; punktzahl <= maxPunkte; punktzahl++) {
-      const prozentExakt = (punktzahl / maxPunkte) * 100;
-      const prozentGerundet = istAufrunden ? Math.ceil(prozentExakt) : Math.floor(prozentExakt);
-
-      for (let i = 0; i < noten.length; i++) {
-        const n = noten[i];
-        if (prozentGerundet >= n.minProz && prozentGerundet <= n.maxProz) {
-          noteMin[i] = Math.min(noteMin[i], punktzahl);
-          noteMax[i] = Math.max(noteMax[i], punktzahl);
-          break;
+      
+      if (istUngerundet) {
+        const minAngezeigt = minExakt;
+        const maxAngezeigt = maxExakt;
+        if (minAngezeigt <= maxAngezeigt) {
+          bereichAnzeige = `${minAngezeigt.toFixed(2)} – ${maxAngezeigt.toFixed(2)}`;
+        } else {
+          bereichAnzeige = '—';
+        }
+      } else if (istAufrunden) {
+        const minAngezeigt = Math.ceil(minExakt);
+        const maxAngezeigt = Math.ceil(maxExakt);
+        if (minAngezeigt <= maxAngezeigt) {
+          bereichAnzeige = `${minAngezeigt} – ${maxAngezeigt}`;
+        } else {
+          bereichAnzeige = '—';
+        }
+      } else {
+        const minAngezeigt = Math.floor(minExakt);
+        const maxAngezeigt = Math.floor(maxExakt);
+        if (minAngezeigt <= maxAngezeigt) {
+          bereichAnzeige = `${minAngezeigt} – ${maxAngezeigt}`;
+        } else {
+          bereichAnzeige = '—';
         }
       }
     }
-
-    for (let i = 0; i < noten.length; i++) {
-      if (noteMin[i] <= noteMax[i]) {
-        htmlString += `<tr>
-          <td>${noten[i].note}</td>
-          <td>${noten[i].punkte}</td>
-          <td>${noteMin[i]} – ${noteMax[i]}</td>
-        </tr>`;
-      } else {
-        htmlString += `<tr>
-          <td>${noten[i].note}</td>
-          <td>${noten[i].punkte}</td>
-          <td>—</td>
-        </tr>`;
-      }
-    }
+    
+    htmlString += `<tr>
+      <td>${note}</td>
+      <td>${punktzahl}</td>
+      <td>${bereichAnzeige}</td>
+    </tr>`;
   }
-
+  
   tbody.innerHTML = htmlString;
 }
 
@@ -151,7 +105,7 @@ downloadBtn.addEventListener('click', function() {
   const filename = `notentabelle_${maxPunkte}p_${modus}.png`;
 
   const table = document.querySelector('table');
-
+  
   html2canvas(table, {
     scale: 2,
     backgroundColor: '#ffffff'
