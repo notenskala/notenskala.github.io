@@ -20,6 +20,12 @@
           <input type="checkbox" id="ungerundetCheckbox" checked> ungerundet
         </label>
       </div>
+
+      <div class="modi-row" id="halbRundenRow">
+        <label class="checkbox-label half-round-label">
+          <input type="checkbox" id="halbRundenCheckbox" disabled> auf 0,5 runden
+        </label>
+      </div>
       
       <div class="modi-row toggle-row hidden" id="toggleRow">
         <span class="toggle-label">abrunden</span>
@@ -31,7 +37,13 @@
       </div>
     </div>
 
-    <button id="downloadBtn" class="download-btn">als Bild herunterladen</button>
+    <div class="dropdown-container">
+      <button id="downloadBtn" class="download-btn">als Bild herunterladen ▼</button>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <button id="downloadTableBtn">Tabelle als Bild</button>
+        <button id="downloadSpiegelBtn">Klausurspiegel</button>
+      </div>
+    </div>
   </div>
   
   <div class="table-wrapper">
