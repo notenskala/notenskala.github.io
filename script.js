@@ -1,20 +1,20 @@
 const noten = [
   { note: '1+', punkte: 15, minProz: 95, maxProz: 100 },
-  { note: '1',  punkte: 14, minProz: 90, maxProz: 94 },
-  { note: '1-', punkte: 13, minProz: 85, maxProz: 89 },
-  { note: '2+', punkte: 12, minProz: 80, maxProz: 84 },
-  { note: '2',  punkte: 11, minProz: 75, maxProz: 79 },
-  { note: '2-', punkte: 10, minProz: 70, maxProz: 74 },
-  { note: '3+', punkte: 9,  minProz: 65, maxProz: 69 },
-  { note: '3',  punkte: 8,  minProz: 60, maxProz: 64 },
-  { note: '3-', punkte: 7,  minProz: 55, maxProz: 59 },
-  { note: '4+', punkte: 6,  minProz: 50, maxProz: 54 },
-  { note: '4',  punkte: 5,  minProz: 45, maxProz: 49 },
-  { note: '4-', punkte: 4,  minProz: 40, maxProz: 44 },
-  { note: '5+', punkte: 3,  minProz: 33, maxProz: 39 },
-  { note: '5',  punkte: 2,  minProz: 27, maxProz: 32 },
-  { note: '5-', punkte: 1,  minProz: 20, maxProz: 26 },
-  { note: '6',  punkte: 0,  minProz: 0,  maxProz: 19 }
+  { note: '1',  punkte: 14, minProz: 90, maxProz: 94.99 },
+  { note: '1-', punkte: 13, minProz: 85, maxProz: 89.99 },
+  { note: '2+', punkte: 12, minProz: 80, maxProz: 84.99 },
+  { note: '2',  punkte: 11, minProz: 75, maxProz: 79.99 },
+  { note: '2-', punkte: 10, minProz: 70, maxProz: 74.99 },
+  { note: '3+', punkte: 9,  minProz: 65, maxProz: 69.99 },
+  { note: '3',  punkte: 8,  minProz: 60, maxProz: 64.99 },
+  { note: '3-', punkte: 7,  minProz: 55, maxProz: 59.99 },
+  { note: '4+', punkte: 6,  minProz: 50, maxProz: 54.99 },
+  { note: '4',  punkte: 5,  minProz: 45, maxProz: 49.99 },
+  { note: '4-', punkte: 4,  minProz: 40, maxProz: 44.99 },
+  { note: '5+', punkte: 3,  minProz: 33, maxProz: 39.99 },
+  { note: '5',  punkte: 2,  minProz: 27, maxProz: 32.99 },
+  { note: '5-', punkte: 1,  minProz: 20, maxProz: 26.99 },
+  { note: '6',  punkte: 0,  minProz: 0,  maxProz: 19.99 }
 ];
 
 function berechneLueckenloseNoten() {
