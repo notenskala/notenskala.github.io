@@ -80,6 +80,19 @@ input:focus {
   color: #333;
 }
 
+.checkbox-label.half-round-label {
+  color: #666;
+}
+
+.checkbox-label.half-round-label.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox-label input:disabled {
+  cursor: not-allowed;
+}
+
 .toggle-row {
   gap: 10px;
   margin-top: 4px;
@@ -149,6 +162,11 @@ input:checked + .slider:before {
   transform: translateX(28px);
 }
 
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
 .download-btn {
   background-color: #2b7a4b;
   color: white;
@@ -172,6 +190,50 @@ input:checked + .slider:before {
 
 .download-btn:active {
   transform: scale(0.97);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  min-width: 200px;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 16px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid white;
+}
+
+.dropdown-menu button {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown-menu.show {
+  display: flex;
 }
 
 .table-wrapper {
@@ -205,7 +267,6 @@ th, td {
   border-bottom: 1px solid #ddd;
 }
 
-/* Zebrastreifen für bessere Lesbarkeit */
 tbody tr:nth-child(even) {
   background-color: #f5f5f5;
 }
@@ -233,6 +294,14 @@ td:last-child, th:last-child {
   .download-btn {
     align-self: flex-start;
   }
+  .dropdown-menu {
+    left: auto;
+    right: 0;
+  }
+  .dropdown-menu::before {
+    left: auto;
+    right: 16px;
+  }
 }
 
 @media (max-width: 450px) {
@@ -250,3 +319,5 @@ td:last-child, th:last-child {
   font-size: 0.9rem;
   color: #666;
 }
+
+/* Klausurspiegel spezifische Styles werden dynamisch erzeugt */
