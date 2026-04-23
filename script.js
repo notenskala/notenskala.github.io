@@ -150,53 +150,27 @@ downloadTableBtn.addEventListener('click', function() {
 });
 
 downloadSpiegelBtn.addEventListener('click', function() {
-  const maxPunkte = parseInt(inputElement.value.trim(), 10);
-  if (isNaN(maxPunkte) || maxPunkte <= 0) {
+  const maxPunkte = inputElement.value.trim();
+  if (maxPunkte === '' || isNaN(parseInt(maxPunkte, 10)) || parseInt(maxPunkte, 10) <= 0) {
     alert('Bitte gültige Maximalpunktzahl eingeben.');
     return;
   }
 
-  const istUngerundet = ungerundetCheckbox.checked;
-  const istHalbRunden = !istUngerundet && halbRundenCheckbox.checked;
-  const istAufrunden = !istUngerundet && !istHalbRunden && rundungToggle.checked;
-
-  const minWerte = noten.map(n => {
-    const exakt = (n.minProz / 100) * maxPunkte;
-    if (istUngerundet) return exakt;
-    if (istHalbRunden) return Math.round(exakt * 2) / 2;
-    return istAufrunden ? Math.ceil(exakt) : Math.floor(exakt);
-  });
-
-  const delta = istUngerundet ? 0.01 : (istHalbRunden ? 0.5 : 1);
-  const maxWerte = new Array(noten.length);
-  maxWerte[0] = maxPunkte;
-  for (let i = 1; i < noten.length; i++) {
-    maxWerte[i] = minWerte[i - 1] - delta;
-  }
-
+  const rows = tbody.querySelectorAll('tr');
   const bereiche = [];
-  for (let i = 0; i < noten.length; i++) {
-    const minWert = minWerte[i];
-    const maxWert = maxWerte[i];
-    if (minWert <= maxWert) {
-      if (istUngerundet) {
-        bereiche.push(`${minWert.toFixed(2)} – ${maxWert.toFixed(2)}`);
-      } else if (istHalbRunden) {
-        bereiche.push(`${minWert.toFixed(1)} – ${maxWert.toFixed(1)}`);
-      } else {
-        bereiche.push(`${Math.floor(minWert)} – ${Math.floor(maxWert)}`);
-      }
-    } else {
-      bereiche.push('—');
+  for (let row of rows) {
+    const td = row.cells[2];
+    if (td) {
+      bereiche.push(td.innerText.trim());
     }
   }
-
   const punkte = noten.map(n => n.punkte);
 
   const wrapper = document.createElement('div');
-  wrapper.style.position = 'absolute';
-  wrapper.style.left = '-9999px';
-  wrapper.style.top = '-9999px';
+  wrapper.style.position = 'fixed';
+  wrapper.style.left = '0';
+  wrapper.style.top = '0';
+  wrapper.style.visibility = 'hidden';
   wrapper.style.padding = '20px';
   wrapper.style.backgroundColor = 'white';
   wrapper.style.fontFamily = 'system-ui, sans-serif';
