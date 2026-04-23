@@ -167,6 +167,9 @@ downloadSpiegelBtn.addEventListener('click', function() {
   const punkte = noten.map(n => n.punkte);
 
   const wrapper = document.createElement('div');
+  wrapper.style.position = 'absolute';
+  wrapper.style.left = '-9999px';
+  wrapper.style.top = '-9999px';
   wrapper.style.padding = '20px';
   wrapper.style.backgroundColor = 'white';
   wrapper.style.fontFamily = 'system-ui, sans-serif';
@@ -209,13 +212,6 @@ downloadSpiegelBtn.addEventListener('click', function() {
   table.appendChild(tbodySpiegel);
 
   wrapper.appendChild(table);
-
-  const title = document.createElement('h3');
-  title.textContent = `Klausurspiegel (max. ${maxPunkte} Punkte)`;
-  title.style.margin = '0 0 15px 0';
-  title.style.textAlign = 'center';
-  wrapper.insertBefore(title, wrapper.firstChild);
-
   document.body.appendChild(wrapper);
 
   html2canvas(wrapper, {
