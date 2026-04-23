@@ -167,12 +167,11 @@ downloadSpiegelBtn.addEventListener('click', function() {
   const punkte = noten.map(n => n.punkte);
 
   const wrapper = document.createElement('div');
-  wrapper.style.position = 'fixed';
-  wrapper.style.left = '0';
+  wrapper.style.position = 'absolute';
+  wrapper.style.left = '-9999px';
   wrapper.style.top = '0';
-  wrapper.style.visibility = 'hidden';
-  wrapper.style.padding = '20px';
   wrapper.style.backgroundColor = 'white';
+  wrapper.style.padding = '20px';
   wrapper.style.fontFamily = 'system-ui, sans-serif';
   wrapper.style.display = 'inline-block';
   wrapper.style.borderRadius = '8px';
@@ -180,8 +179,9 @@ downloadSpiegelBtn.addEventListener('click', function() {
 
   const table = document.createElement('table');
   table.style.borderCollapse = 'collapse';
-  table.style.width = '100%';
-  table.style.minWidth = '600px';
+  table.style.whiteSpace = 'nowrap';
+  table.style.width = 'auto';
+  table.style.tableLayout = 'auto';
 
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
