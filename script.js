@@ -161,7 +161,14 @@ downloadSpiegelBtn.addEventListener('click', function() {
   for (let row of rows) {
     const td = row.cells[2];
     if (td) {
-      bereiche.push(td.innerText.trim());
+      let bereich = td.innerText.trim();
+      if (bereich !== '—') {
+        const teile = bereich.split(' – ');
+        if (teile.length === 2) {
+          bereich = `${teile[1]} – ${teile[0]}`;
+        }
+      }
+      bereiche.push(bereich);
     }
   }
   const punkte = noten.map(n => n.punkte);
