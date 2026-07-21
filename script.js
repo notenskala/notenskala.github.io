@@ -1,5 +1,3 @@
-!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).html2canvas=t()}(this,(function(){"use strict";return function(e,t){return Promise.resolve({toDataURL:function(){return"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="}})}}));
-
 const basisNoten = [
   { note: '1+', punkte: 15, basisProz: 95 },
   { note: '1',  punkte: 14, basisProz: 90 },
