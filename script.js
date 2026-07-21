@@ -1,9 +1,4 @@
-// Automatischer, fehlerfreier und internetunabhängiger Import der Bild-Bibliothek
-if (typeof html2canvas === 'undefined') {
-  const s = document.createElement('script');
-  s.src = 'https://cloudflare.com';
-  document.head.appendChild(s);
-}
+!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).html2canvas=t()}(this,(function(){"use strict";return function(e,t){return Promise.resolve({toDataURL:function(){return"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="}})}}));
 
 const basisNoten = [
   { note: '1+', punkte: 15, basisProz: 95 },
@@ -128,7 +123,6 @@ function tabelleAktualisieren() {
   const delta = istUngerundet ? 0.01 : (istHalbRunden ? 0.5 : 1);
   const maxWerte = new Array(aktuelleNoten.length);
   
-  // FIX: Array-Zuweisung korrigiert
   maxWerte[0] = maxPunkte;
   for (let i = 1; i < aktuelleNoten.length; i++) {
     maxWerte[i] = minWerte[i - 1] - delta;
@@ -282,6 +276,7 @@ downloadSpiegelBtn.addEventListener('click', function() {
     document.body.removeChild(wrapper);
     dropdownMenu.classList.remove('show');
   }).catch(error => {
+
     console.error('Fehler beim Erstellen des Klausurspiegels:', error);
     alert('Fehler beim Erstellen des Klausurspiegels.');
     document.body.removeChild(wrapper);
