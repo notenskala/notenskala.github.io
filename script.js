@@ -19,6 +19,8 @@ const basisNoten = [
 
 const inputElement = document.getElementById('maxPunkte');
 const bestehenInputElement = document.getElementById('bestehenProzent');
+const anpassenBestehenCheckbox = document.getElementById('anpassenBestehenCheckbox');
+const bestehenRow = document.getElementById('bestehenRow');
 const tbody = document.getElementById('tabellenKoerper');
 const ungerundetCheckbox = document.getElementById('ungerundetCheckbox');
 const halbRundenCheckbox = document.getElementById('halbRundenCheckbox');
@@ -40,6 +42,16 @@ document.addEventListener('click', (e) => {
   if (!downloadBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
     dropdownMenu.classList.remove('show');
   }
+});
+
+anpassenBestehenCheckbox.addEventListener('change', function() {
+  if (this.checked) {
+    bestehenRow.classList.remove('hidden');
+  } else {
+    bestehenRow.classList.add('hidden');
+    bestehenInputElement.value = 45;
+  }
+  tabelleAktualisieren();
 });
 
 ungerundetCheckbox.addEventListener('change', function() {
