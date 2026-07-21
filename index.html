@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notenskala Berechnung - Gymnasiale Oberstufe</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cloudflare.com"></script>
 </head>
 <body>
 <div class="container">
@@ -13,6 +13,10 @@
   <div class="input-area">
     <label for="maxPunkte">Maximal erreichbare Punktzahl:</label>
     <input type="number" id="maxPunkte" min="1" step="1" value="100" placeholder="z.B. 100">
+    
+    <!-- NEU: Eingabefeld für die flexible Bestehensgrenze -->
+    <label for="bestehenProzent">Bestehensgrenze Note 4 (in %):</label>
+    <input type="number" id="bestehenProzent" min="1" max="94" step="1" value="45" placeholder="Standard: 45">
     
     <div class="modi-container">
       <div class="modi-row">
@@ -62,7 +66,7 @@
   <div class="footer">
   <span>
     proudly developed with love by Niklas Karoli
-    <svg class="pride-heart" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg class="pride-heart" viewBox="0 0 32 32" fill="none" xmlns="http://w3.org">
       <defs>
         <linearGradient id="prideGradient" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#E40303" />
