@@ -13,10 +13,17 @@
     <label for="maxPunkte">Maximal erreichbare Punktzahl:</label>
     <input type="number" id="maxPunkte" min="1" step="1" value="100" placeholder="z.B. 100">
     
-    <label for="bestehenProzent">Bestehensgrenze Note 4 (in %):</label>
-    <input type="number" id="bestehenProzent" min="1" max="94" step="1" value="45" placeholder="Standard: 45">
-    
     <div class="modi-container">
+      <div class="modi-row">
+        <label class="checkbox-label">
+          <input type="checkbox" id="anpassenBestehenCheckbox"> Bestehensgrenze anpassen
+        </label>
+      </div>
+      <div class="modi-row toggle-row hidden" id="bestehenRow">
+        <label for="bestehenProzent" class="toggle-label">Note 4 Grenze (%):</label>
+        <input type="number" id="bestehenProzent" min="1" max="94" step="1" value="45" style="width: 80px; margin-left: 8px; padding: 0.3rem 0.5rem; font-size: 0.9rem;">
+      </div>
+
       <div class="modi-row">
         <label class="checkbox-label">
           <input type="checkbox" id="ungerundetCheckbox" checked> ungerundet
@@ -24,7 +31,7 @@
       </div>
 
       <div class="modi-row" id="halbRundenRow">
-        <label class="checkbox-label half-round-label">
+        <label class="checkbox-label half-round-label disabled">
           <input type="checkbox" id="halbRundenCheckbox" disabled> auf 0,5 runden
         </label>
       </div>
