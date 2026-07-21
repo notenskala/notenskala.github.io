@@ -1,23 +1,24 @@
-const noten = [
-  { note: '1+', punkte: 15, minProz: 95 },
-  { note: '1',  punkte: 14, minProz: 90 },
-  { note: '1-', punkte: 13, minProz: 85 },
-  { note: '2+', punkte: 12, minProz: 80 },
-  { note: '2',  punkte: 11, minProz: 75 },
-  { note: '2-', punkte: 10, minProz: 70 },
-  { note: '3+', punkte: 9,  minProz: 65 },
-  { note: '3',  punkte: 8,  minProz: 60 },
-  { note: '3-', punkte: 7,  minProz: 55 },
-  { note: '4+', punkte: 6,  minProz: 50 },
-  { note: '4',  punkte: 5,  minProz: 45 },
-  { note: '4-', punkte: 4,  minProz: 40 },
-  { note: '5+', punkte: 3,  minProz: 33 },
-  { note: '5',  punkte: 2,  minProz: 27 },
-  { note: '5-', punkte: 1,  minProz: 20 },
-  { note: '6',  punkte: 0,  minProz: 0 }
+const basisNoten = [
+  { note: '1+', punkte: 15, basisProz: 95 },
+  { note: '1',  punkte: 14, basisProz: 90 },
+  { note: '1-', punkte: 13, basisProz: 85 },
+  { note: '2+', punkte: 12, basisProz: 80 },
+  { note: '2',  punkte: 11, basisProz: 75 },
+  { note: '2-', punkte: 10, basisProz: 70 },
+  { note: '3+', punkte: 9,  basisProz: 65 },
+  { note: '3',  punkte: 8,  basisProz: 60 },
+  { note: '3-', punkte: 7,  basisProz: 55 },
+  { note: '4+', punkte: 6,  basisProz: 50 },
+  { note: '4',  punkte: 5,  basisProz: 45 },
+  { note: '4-', punkte: 4,  basisProz: 40 },
+  { note: '5+', punkte: 3,  basisProz: 33 },
+  { note: '5',  punkte: 2,  basisProz: 27 },
+  { note: '5-', punkte: 1,  basisProz: 20 },
+  { note: '6',  punkte: 0,  basisProz: 0 }
 ];
 
 const inputElement = document.getElementById('maxPunkte');
+const bestehenInputElement = document.getElementById('bestehenProzent');
 const tbody = document.getElementById('tabellenKoerper');
 const ungerundetCheckbox = document.getElementById('ungerundetCheckbox');
 const halbRundenCheckbox = document.getElementById('halbRundenCheckbox');
@@ -27,6 +28,8 @@ const downloadBtn = document.getElementById('downloadBtn');
 const dropdownMenu = document.getElementById('dropdownMenu');
 const downloadTableBtn = document.getElementById('downloadTableBtn');
 const downloadSpiegelBtn = document.getElementById('downloadSpiegelBtn');
+
+let aktuelleNoten = JSON.parse(JSON.stringify(basisNoten));
 
 downloadBtn.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -55,9 +58,43 @@ ungerundetCheckbox.addEventListener('change', function() {
 rundungToggle.addEventListener('change', tabelleAktualisieren);
 halbRundenCheckbox.addEventListener('change', tabelleAktualisieren);
 inputElement.addEventListener('input', tabelleAktualisieren);
+bestehenInputElement.addEventListener('input', tabelleAktualisieren);
+
+function berechneDynamischeProzentwerte(neueGrenzeNote4) {
+  aktuelleNoten = basisNoten.map(n => {
+    let angepassterProzentwert = n.basisProz;
+    
+    if (n.punkte === 5) {
+      angepassterProzentwert = neueGrenzeNote4;
+    } else if (n.punkte > 5) {
+      const basisSpanne = 95 - 45;
+      const neueSpanne = 95 - neueGrenzeNote4;
+      angepassterProzentwert = neueGrenzeNote4 + ((n.basisProz - 45) * neueSpanne / basisSpanne);
+    } else if (n.punkte < 5 && n.punkte > 0) {
+      const basisSpanne = 45 - 0;
+      const neueSpanne = neueGrenzeNote4 - 0;
+      angepassterProzentwert = 0 + ((n.basisProz - 0) * neueSpanne / basisSpanne);
+    }
+    
+    if (n.punkte === 15) angepassterProzentwert = 95; 
+    if (n.punkte === 0) angepassterProzentwert = 0;
+
+    return {
+      note: n.note,
+      punkte: n.punkte,
+      minProz: Math.max(0, Math.min(100, angepassterProzentwert))
+    };
+  });
+}
 
 function tabelleAktualisieren() {
   let maxPunkte = parseInt(inputElement.value, 10);
+  let neueGrenzeNote4 = parseInt(bestehenInputElement.value, 10);
+  
+  if (isNaN(neueGrenzeNote4) || neueGrenzeNote4 < 1 || neueGrenzeNote4 > 94) {
+    neueGrenzeNote4 = 45;
+  }
+
   const gueltig = !isNaN(maxPunkte) && maxPunkte > 0;
   const istUngerundet = ungerundetCheckbox.checked;
   const istHalbRunden = !istUngerundet && halbRundenCheckbox.checked;
@@ -68,7 +105,9 @@ function tabelleAktualisieren() {
     return;
   }
 
-  const minWerte = noten.map(n => {
+  berechneDynamischeProzentwerte(neueGrenzeNote4);
+
+  const minWerte = aktuelleNoten.map(n => {
     const exakt = (n.minProz / 100) * maxPunkte;
     if (istUngerundet) {
       return exakt;
@@ -80,16 +119,16 @@ function tabelleAktualisieren() {
   });
 
   const delta = istUngerundet ? 0.01 : (istHalbRunden ? 0.5 : 1);
-  const maxWerte = new Array(noten.length);
+  const maxWerte = new Array(aktuelleNoten.length);
   maxWerte[0] = maxPunkte;
-  for (let i = 1; i < noten.length; i++) {
+  for (let i = 1; i < aktuelleNoten.length; i++) {
     maxWerte[i] = minWerte[i - 1] - delta;
   }
 
   let htmlString = '';
-  for (let i = 0; i < noten.length; i++) {
-    const note = noten[i].note;
-    const punktzahl = noten[i].punkte;
+  for (let i = 0; i < aktuelleNoten.length; i++) {
+    const note = aktuelleNoten[i].note;
+    const punktzahl = aktuelleNoten[i].punkte;
     let bereichAnzeige = '—';
 
     const minWert = minWerte[i];
@@ -171,7 +210,7 @@ downloadSpiegelBtn.addEventListener('click', function() {
       bereiche.push(bereich);
     }
   }
-  const punkte = noten.map(n => n.punkte);
+  const punkte = aktuelleNoten.map(n => n.punkte);
 
   const wrapper = document.createElement('div');
   wrapper.style.position = 'absolute';
@@ -235,6 +274,7 @@ downloadSpiegelBtn.addEventListener('click', function() {
     dropdownMenu.classList.remove('show');
   }).catch(error => {
     console.error('Fehler beim Erstellen des Klausurspiegels:', error);
+
     alert('Fehler beim Erstellen des Klausurspiegels.');
     document.body.removeChild(wrapper);
   });
