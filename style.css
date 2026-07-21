@@ -319,3 +319,15 @@ td:last-child, th:last-child {
   font-size: 0.9rem;
   color: #666;
 }
+
+.footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.pride-heart {
+  width: 1.2rem;
+  height: 1.2rem;
+  display: inline-block;
+}
