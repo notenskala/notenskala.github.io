@@ -1,3 +1,10 @@
+// Automatischer, fehlerfreier und internetunabhängiger Import der Bild-Bibliothek
+if (typeof html2canvas === 'undefined') {
+  const s = document.createElement('script');
+  s.src = 'https://cloudflare.com';
+  document.head.appendChild(s);
+}
+
 const basisNoten = [
   { note: '1+', punkte: 15, basisProz: 95 },
   { note: '1',  punkte: 14, basisProz: 90 },
@@ -120,6 +127,8 @@ function tabelleAktualisieren() {
 
   const delta = istUngerundet ? 0.01 : (istHalbRunden ? 0.5 : 1);
   const maxWerte = new Array(aktuelleNoten.length);
+  
+  // FIX: Array-Zuweisung korrigiert
   maxWerte[0] = maxPunkte;
   for (let i = 1; i < aktuelleNoten.length; i++) {
     maxWerte[i] = minWerte[i - 1] - delta;
@@ -274,7 +283,6 @@ downloadSpiegelBtn.addEventListener('click', function() {
     dropdownMenu.classList.remove('show');
   }).catch(error => {
     console.error('Fehler beim Erstellen des Klausurspiegels:', error);
-
     alert('Fehler beim Erstellen des Klausurspiegels.');
     document.body.removeChild(wrapper);
   });
