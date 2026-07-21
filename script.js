@@ -181,10 +181,18 @@ downloadTableBtn.addEventListener('click', function() {
     alert('Bitte gültige Maximalpunktzahl eingeben.');
     return;
   }
+  
+  const wrapper = document.querySelector('.table-wrapper');
+  const table = document.querySelector('table');
+  const ths = table.querySelectorAll('th');
+
+  const alterScrollStand = wrapper.scrollTop;
+  wrapper.scrollTop = 0;
+  
+  ths.forEach(th => th.style.position = 'static');
+
   const modus = getRundungsModus();
   const filename = `notentabelle_${maxPunkte}p_${modus}.png`;
-
-  const table = document.querySelector('table');
 
   html2canvas(table, {
     scale: 2,
@@ -194,10 +202,16 @@ downloadTableBtn.addEventListener('click', function() {
     link.download = filename;
     link.href = canvas.toDataURL('image/png');
     link.click();
+    
+    ths.forEach(th => th.style.position = 'sticky');
+    wrapper.scrollTop = alterScrollStand;
+    
     dropdownMenu.classList.remove('show');
   }).catch(error => {
+    ths.forEach(th => th.style.position = 'sticky');
+    wrapper.scrollTop = alterScrollStand;
     console.error('Fehler beim Erstellen des Bildes:', error);
-    alert('Fehler beim Erstellen des Bildes. Bitte versuche es erneut.');
+    alert('Fehler beim Erstellen des Bildes.');
   });
 });
 
@@ -211,7 +225,7 @@ downloadSpiegelBtn.addEventListener('click', function() {
   const rows = tbody.querySelectorAll('tr');
   const bereiche = [];
   for (let row of rows) {
-    const td = row.cells[2];
+    const td = row.cells[2]; 
     if (td) {
       let bereich = td.innerText.trim();
       if (bereich !== '—') {
