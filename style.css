@@ -94,6 +94,9 @@ input:focus {
 }
 
 .toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: 10px;
   margin-top: 4px;
   transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
