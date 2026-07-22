@@ -184,7 +184,7 @@ function tabelleAktualisieren() {
     }
   });
 
-  const delta = istUngerundet ? 0.01 : (istHalbRunden ? 0.5 : 1);
+  const delta = (istUngerundet || istHalbRunden) ? 0.01 : 1;
   const maxWerte = new Array(aktuelleNoten.length);
   
   maxWerte[0] = maxPunkte;
