@@ -31,7 +31,13 @@ const dropdownMenu = document.getElementById('dropdownMenu');
 const downloadTableBtn = document.getElementById('downloadTableBtn');
 const downloadSpiegelBtn = document.getElementById('downloadSpiegelBtn');
 
-let aktuelleNoten = JSON.parse(JSON.stringify(basisNoten));
+const expertenModusCheckbox = document.getElementById('expertenModusCheckbox');
+const warnModal = document.getElementById('warnModal');
+const modalCloseBtn = document.getElementById('modalCloseBtn');
+const tabelleHeaderRow = document.getElementById('tabelleHeaderRow');
+
+let eigeneProzentwerte = basisNoten.map(n => n.basisProz);
+let expertenModusAktiv = false;
 
 downloadBtn.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -72,7 +78,40 @@ halbRundenCheckbox.addEventListener('change', tabelleAktualisieren);
 inputElement.addEventListener('input', tabelleAktualisieren);
 bestehenInputElement.addEventListener('input', tabelleAktualisieren);
 
+expertenModusCheckbox.addEventListener('change', function() {
+  if (this.checked) {
+    warnModal.classList.remove('hidden');
+  } else {
+    expertenModusAktiv = false;
+    anpassenBestehenCheckbox.disabled = false;
+    anpassenBestehenCheckbox.parentElement.classList.remove('disabled');
+    tabelleAktualisieren();
+  }
+});
+
+modalCloseBtn.addEventListener('click', function() {
+  warnModal.classList.add('hidden');
+  expertenModusAktiv = true;
+  anpassenBestehenCheckbox.checked = false;
+  anpassenBestehenCheckbox.disabled = true;
+  anpassenBestehenCheckbox.parentElement.classList.add('disabled');
+  bestehenRow.classList.add('hidden');
+  eigeneProzentwerte = basisNoten.map(n => n.basisProz);
+  tabelleAktualisieren();
+});
+
 function berechneDynamischeProzentwerte(neueGrenzeNote4) {
+  if (expertenModusAktiv) {
+    aktuelleNoten = basisNoten.map((n, idx) => {
+      return {
+        note: n.note,
+        punkte: n.punkte,
+        minProz: eigeneProzentwerte[idx]
+      };
+    });
+    return;
+  }
+
   aktuelleNoten = basisNoten.map(n => {
     let angepassterProzentwert = n.basisProz;
     
@@ -111,6 +150,21 @@ function tabelleAktualisieren() {
   const istUngerundet = ungerundetCheckbox.checked;
   const istHalbRunden = !istUngerundet && halbRundenCheckbox.checked;
   const istAufrunden = !istUngerundet && !istHalbRunden && rundungToggle.checked;
+
+  if (expertenModusAktiv) {
+    tabelleHeaderRow.innerHTML = `
+      <th>Note</th>
+      <th>Punktzahl</th>
+      <th>Mindest-%</th>
+      <th>Erreichte Punktzahl</th>
+    `;
+  } else {
+    tabelleHeaderRow.innerHTML = `
+      <th>Note</th>
+      <th>Punktzahl</th>
+      <th>Erreichte Punktzahl</th>
+    `;
+  }
 
   if (!gueltig) {
     tbody.innerHTML = '';
@@ -157,16 +211,58 @@ function tabelleAktualisieren() {
       }
     }
 
-    htmlString += `
-      <tr>
-        <td>${note}</td>
-        <td>${punktzahl}</td>
-        <td>${bereichAnzeige}</td>
-      </tr>
-    `;
+    if (expertenModusAktiv) {
+      htmlString += `
+        <tr>
+          <td>${note}</td>
+          <td>${punktzahl}</td>
+          <td>
+            <input type="number" class="prozent-input" data-index="${i}" min="0" max="100" step="0.5" value="${eigeneProzentwerte[i]}">%
+          </td>
+          <td>${bereichAnzeige}</td>
+        </tr>
+      `;
+    } else {
+      htmlString += `
+        <tr>
+          <td>${note}</td>
+          <td>${punktzahl}</td>
+          <td>${bereichAnzeige}</td>
+        </tr>
+      `;
+    }
   }
 
   tbody.innerHTML = htmlString;
+
+  if (expertenModusAktiv) {
+    const inputs = tbody.querySelectorAll('.prozent-input');
+    inputs.forEach(inp => {
+      inp.addEventListener('change', function() {
+        const idx = parseInt(this.dataset.index, 10);
+        let val = parseFloat(this.value);
+
+        if (isNaN(val)) val = 0;
+        val = Math.max(0, Math.min(100, val));
+
+        let minErlaubt = 0;
+        let maxErlaubt = 100;
+
+        if (idx < eigeneProzentwerte.length - 1) {
+          minErlaubt = eigeneProzentwerte[idx + 1];
+        }
+        if (idx > 0) {
+          maxErlaubt = eigeneProzentwerte[idx - 1];
+        }
+
+        if (val < minErlaubt) val = minErlaubt;
+        if (val > maxErlaubt) val = maxErlaubt;
+
+        eigeneProzentwerte[idx] = val;
+        tabelleAktualisieren();
+      });
+    });
+  }
 }
 
 function getRundungsModus() {
@@ -224,8 +320,10 @@ downloadSpiegelBtn.addEventListener('click', function() {
 
   const rows = tbody.querySelectorAll('tr');
   const bereiche = [];
+  const zielSpalteIndex = expertenModusAktiv ? 3 : 2;
+
   for (let row of rows) {
-    const td = row.cells[2]; 
+    const td = row.cells[zielSpalteIndex]; 
     if (td) {
       let bereich = td.innerText.trim();
       if (bereich !== '—') {
@@ -300,7 +398,6 @@ downloadSpiegelBtn.addEventListener('click', function() {
     document.body.removeChild(wrapper);
     dropdownMenu.classList.remove('show');
   }).catch(error => {
-
     console.error('Fehler beim Erstellen des Klausurspiegels:', error);
     alert('Fehler beim Erstellen des Klausurspiegels.');
     document.body.removeChild(wrapper);
