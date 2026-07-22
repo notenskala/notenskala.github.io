@@ -184,12 +184,17 @@ function tabelleAktualisieren() {
     }
   });
 
-  const delta = istUngerundet ? 0.01 : (istHalbRunden ? 0.5 : 1);
   const maxWerte = new Array(aktuelleNoten.length);
   
   maxWerte[0] = maxPunkte;
   for (let i = 1; i < aktuelleNoten.length; i++) {
-    maxWerte[i] = minWerte[i - 1] - delta;
+    if (istUngerundet) {
+      maxWerte[i] = minWerte[i - 1] - 0.01;
+    } else if (istHalbRunden) {
+      maxWerte[i] = minWerte[i - 1] - 0.5;
+    } else {
+      maxWerte[i] = minWerte[i - 1] - 1;
+    }
   }
 
   let htmlString = '';
@@ -198,14 +203,21 @@ function tabelleAktualisieren() {
     const punktzahl = aktuelleNoten[i].punkte;
     let bereichAnzeige = '—';
 
-    const minWert = minWerte[i];
-    const maxWert = maxWerte[i];
+    let minWert = minWerte[i];
+    let maxWert = maxWerte[i];
+
+    if (istHalbRunden && i > 0) {
+      const naechsteHoehereMinExakt = (aktuelleNoten[i - 1].minProz / 100) * maxPunkte;
+      if (Math.abs(naechsteHoehereMinExakt - Math.round(naechsteHoehereMinExakt * 2) / 2) < 1e-9) {
+        maxWert = naechsteHoehereMinExakt - 0.01;
+      }
+    }
 
     if (minWert <= maxWert) {
       if (istUngerundet) {
         bereichAnzeige = `${minWert.toFixed(2)} – ${maxWert.toFixed(2)}`;
       } else if (istHalbRunden) {
-        bereichAnzeige = `${minWert.toFixed(1)} – ${maxWert.toFixed(1)}`;
+        bereichAnzeige = `${minWert.toFixed(1)} – ${maxWert.toFixed(2)}`;
       } else {
         bereichAnzeige = `${Math.floor(minWert)} – ${Math.floor(maxWert)}`;
       }
