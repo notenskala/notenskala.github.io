@@ -207,7 +207,7 @@ function tabelleAktualisieren() {
       } else if (istHalbRunden) {
         bereichAnzeige = `${minWert.toFixed(1)} – ${maxWert.toFixed(1)}`;
       } else {
-        bereichAnzeige = `${Math.round(minWert)} – ${Math.round(maxWert)}`;
+        bereichAnzeige = `${Math.floor(minWert)} – ${Math.floor(maxWert)}`;
       }
     }
 
